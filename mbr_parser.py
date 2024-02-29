@@ -51,8 +51,14 @@ def big_endian_to_little_endian(content, n):
 
 def file_system(partition):
     files_dict = {
-        "83": "Linux",
+        "00": "empty",
+        "01": "FAT12",
+        "04": "FAT16",
         "07": "NTFS",
+        "83": "Linux",
+        "a8": "MACOSX",
+        "fb": "VMWARE_FILE_SYSTEM",
+        "fc": "VMWARE_SWAP",
     }
     return files_dict.get(partition[b(4) : b(5)].decode(), "Unknown")
 
