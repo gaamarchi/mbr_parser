@@ -2,6 +2,8 @@
 import binascii
 import socket
 import argparse
+
+
 def b(x):
     return x * 2
 
@@ -19,8 +21,10 @@ def have_boot_signature(content) -> bool:
 def remove_unless_bytes(contet):
     return hex_content[b(446) : -b(2)]
 
+
 def it_is_bootable(content):
-    return content[:b(1)].decode() == "80"
+    return content[: b(1)].decode() == "80"
+
 
 def have_n_bytes(content, n):
     return len(content) == b(n)
@@ -41,8 +45,9 @@ def have_info(partition):
     return set(partition) != {48}
 
 
-def big_endian_to_little_endian(content,n):
-    return socket.ntohl(int(content[b(n) : b(n+4)].decode(), 16))
+def big_endian_to_little_endian(content, n):
+    return socket.ntohl(int(content[b(n) : b(n + 4)].decode(), 16))
+
 
 def file_system(partition):
     files_dict = {
@@ -51,14 +56,14 @@ def file_system(partition):
     }
     return files_dict.get(partition[b(4) : b(5)].decode(), "Unknown")
 
+
 def calculate_size(partition):
-    return (big_endian_to_little_endian(partition, 12) * 512)
+    return big_endian_to_little_endian(partition, 12) * 512
 
 
 argparse = argparse.ArgumentParser()
-argparse.add_argument("file", help="file to be parsed")
+argparse.add_argument("-f", "--file", help="file to be parsed")
 args = argparse.parse_args()
-
 
 
 hex_content = convert_to_hex(args.file)
@@ -73,9 +78,17 @@ for i in range(4):
         print(f"partition {i+1}")
         print("     is bootable:", it_is_bootable(partitions[i]))
         print("     file system:", file_system(partitions[i]))
-        print("     start sector:", big_endian_to_little_endian(partitions[i],8))
-        print("     size in: {:.4f} KB".format(calculate_size(partitions[i])/1024) )
-        print("     size in: {:.4f} MB".format(calculate_size(partitions[i])/1024/1024) )
-        print("     size in: {:.4f} GB".format(calculate_size(partitions[i])/1024/1024/1024))
+        print("     start sector:", big_endian_to_little_endian(partitions[i], 8))
+        print("     size in: {:.4f} KB".format(calculate_size(partitions[i]) / 1024))
+        print(
+            "     size in: {:.4f} MB".format(
+                calculate_size(partitions[i]) / 1024 / 1024
+            )
+        )
+        print(
+            "     size in: {:.4f} GB".format(
+                calculate_size(partitions[i]) / 1024 / 1024 / 1024
+            )
+        )
     else:
         print(f"partition {i+1} is empty")
