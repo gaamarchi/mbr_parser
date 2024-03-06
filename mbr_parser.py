@@ -82,17 +82,30 @@ partitions = get_partition(clean_content)
 for i in range(4):
     if have_info(partitions[i]):
         print(f"partition {i+1}")
-        print("     is bootable:", it_is_bootable(partitions[i]))
-        print("     file system:", file_system(partitions[i]))
-        print("     start sector:", big_endian_to_little_endian(partitions[i], 8))
-        print("     size in: {:.4f} KB".format(calculate_size(partitions[i]) / 1024))
         print(
-            "     size in: {:.4f} MB".format(
+            " ".join(
+                partitions[i].decode()[j : j + 2]
+                for j in range(0, len(partitions[i].decode()), 2)
+            )
+        )
+        print("     is bootable [1byte]:", it_is_bootable(partitions[i]))
+        print("     file system [5byte]:", file_system(partitions[i]))
+        print(
+            "     start sector [9-12byte]:",
+            big_endian_to_little_endian(partitions[i], 8),
+        )
+        print(
+            "     size in [13-16byte]: {:.4f} KB".format(
+                calculate_size(partitions[i]) / 1024
+            )
+        )
+        print(
+            "     size in [13-16byte]: {:.4f} MB".format(
                 calculate_size(partitions[i]) / 1024 / 1024
             )
         )
         print(
-            "     size in: {:.4f} GB".format(
+            "     size in [13-16byte]: {:.4f} GB".format(
                 calculate_size(partitions[i]) / 1024 / 1024 / 1024
             )
         )
